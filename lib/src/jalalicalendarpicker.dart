@@ -47,15 +47,12 @@ const double _kDatePickerLandscapeHeight =
 // Shows the selected date in large font and toggles between year and day mode
 class _DatePickerHeader extends StatelessWidget {
   const _DatePickerHeader({
-    Key key,
-    @required this.selectedDate,
-    @required this.mode,
-    @required this.onModeChanged,
-    @required this.orientation,
-  })  : assert(selectedDate != null),
-        assert(mode != null),
-        assert(orientation != null),
-        super(key: key);
+    Key? key,
+    required this.selectedDate,
+    required this.mode,
+    required this.onModeChanged,
+    required this.orientation,
+  })  : super(key: key);
 
   final DateTime selectedDate;
   final DatePickerMode mode;
@@ -86,10 +83,10 @@ class _DatePickerHeader extends StatelessWidget {
         yearColor = mode == DatePickerMode.year ? Colors.white : Colors.white70;
         break;
     }
-    final TextStyle dayStyle = headerTextTheme.display1
+    final TextStyle dayStyle = headerTextTheme.headline4!
         .copyWith(color: dayColor, height: 1.4, fontSize: 23.0);
     final TextStyle yearStyle =
-        headerTextTheme.subhead.copyWith(color: yearColor, height: 1.4);
+        headerTextTheme.subtitle1!.copyWith(color: yearColor, height: 1.4);
 
     Color backgroundColor;
     switch (themeData.brightness) {
@@ -101,8 +98,8 @@ class _DatePickerHeader extends StatelessWidget {
         break;
     }
 
-    double width;
-    double height;
+    double? width;
+    double? height;
     EdgeInsets padding;
     MainAxisAlignment mainAxisAlignment;
     switch (orientation) {
@@ -166,15 +163,15 @@ class _DatePickerHeader extends StatelessWidget {
 
 class _DateHeaderButton extends StatelessWidget {
   const _DateHeaderButton({
-    Key key,
+    Key? key,
     this.onTap,
     this.color,
     this.child,
   }) : super(key: key);
 
-  final VoidCallback onTap;
-  final Color color;
-  final Widget child;
+  final VoidCallback? onTap;
+  final Color? color;
+  final Widget? child;
 
   @override
   Widget build(BuildContext context) {
@@ -239,19 +236,15 @@ class DayPicker extends StatelessWidget {
   ///
   /// Rarely used directly. Instead, typically used as part of a [MonthPicker].
   DayPicker({
-    Key key,
-    @required this.selectedDate,
-    @required this.currentDate,
-    @required this.onChanged,
-    @required this.firstDate,
-    @required this.lastDate,
-    @required this.displayedMonth,
+    Key? key,
+    required this.selectedDate,
+    required this.currentDate,
+    required this.onChanged,
+    required this.firstDate,
+    required this.lastDate,
+    required this.displayedMonth,
     this.selectableDayPredicate,
-  })  : assert(selectedDate != null),
-        assert(currentDate != null),
-        assert(onChanged != null),
-        assert(displayedMonth != null),
-        assert(!firstDate.isAfter(lastDate)),
+  })  : assert(!firstDate.isAfter(lastDate)),
         assert(selectedDate.isAfter(firstDate) ||
             selectedDate.isAtSameMomentAs(firstDate)),
         super(key: key);
@@ -277,7 +270,7 @@ class DayPicker extends StatelessWidget {
   final DateTime displayedMonth;
 
   /// Optional user supplied predicate function to customize selectable days.
-  final SelectableDayPredicate selectableDayPredicate;
+  final SelectableDayPredicate? selectableDayPredicate;
 
   /// Builds widgets showing abbreviated days of week. The first widget in the
   /// returned list corresponds to the first day of week for the current locale.
@@ -446,10 +439,10 @@ class DayPicker extends StatelessWidget {
         final bool disabled = dayToBuild.isAfter(lastDate) ||
             dayToBuild.isBefore(firstDate) ||
             (selectableDayPredicate != null &&
-                !selectableDayPredicate(dayToBuild));
+                !selectableDayPredicate!(dayToBuild));
 
-        BoxDecoration decoration;
-        TextStyle itemStyle = themeData.textTheme.body1;
+        BoxDecoration? decoration;
+        TextStyle? itemStyle = themeData.textTheme.bodyText2;
 
         final bool isSelectedDay =
             selectedPersainDate.year == getPearData.year &&
@@ -457,21 +450,21 @@ class DayPicker extends StatelessWidget {
                 selectedPersainDate.day == day;
         if (isSelectedDay) {
           // The selected day gets a circle background highlight, and a contrasting text color.
-          itemStyle = themeData.accentTextTheme.body2;
+          itemStyle = themeData.accentTextTheme.bodyText1;
           decoration = BoxDecoration(
               color: themeData.accentColor, shape: BoxShape.circle);
         } else if (disabled) {
-          itemStyle = themeData.textTheme.body1
+          itemStyle = themeData.textTheme.bodyText2!
               .copyWith(color: themeData.disabledColor);
         } else if (currentPDate.year == getPearData.year &&
             currentPDate.month == getPearData.month &&
             currentPDate.day == day) {
           // The current day gets a different text color.
           itemStyle =
-              themeData.textTheme.body2.copyWith(color: themeData.accentColor);
+              themeData.textTheme.bodyText1!.copyWith(color: themeData.accentColor);
         } else if (getHolidy.isHoliday) {
           // The current day gets a different text color.
-          itemStyle = themeData.textTheme.body2.copyWith(color: Colors.red);
+          itemStyle = themeData.textTheme.bodyText1!.copyWith(color: Colors.red);
         }
         Widget dayWidget = Container(
           decoration: decoration,
@@ -519,7 +512,7 @@ class DayPicker extends StatelessWidget {
                   child: ExcludeSemantics(
                     child: Text(
                       "${pdate.monthname}  ${pdate.year}",
-                      style: themeData.textTheme.subhead,
+                      style: themeData.textTheme.subtitle1,
                     ),
                   ),
                 ),
@@ -555,15 +548,13 @@ class MonthPicker extends StatefulWidget {
   /// Rarely used directly. Instead, typically used as part of the dialog shown
   /// by [showDatePicker].
   MonthPicker({
-    Key key,
-    @required this.selectedDate,
-    @required this.onChanged,
-    @required this.firstDate,
-    @required this.lastDate,
+    Key? key,
+    required this.selectedDate,
+    required this.onChanged,
+    required this.firstDate,
+    required this.lastDate,
     this.selectableDayPredicate,
-  })  : assert(selectedDate != null),
-        assert(onChanged != null),
-        assert(!firstDate.isAfter(lastDate)),
+  })  : assert(!firstDate.isAfter(lastDate)),
         assert(selectedDate.isAfter(firstDate) ||
             selectedDate.isAtSameMomentAs(firstDate)),
         super(key: key);
@@ -583,7 +574,7 @@ class MonthPicker extends StatefulWidget {
   final DateTime lastDate;
 
   /// Optional user supplied predicate function to customize selectable days.
-  final SelectableDayPredicate selectableDayPredicate;
+  final SelectableDayPredicate? selectableDayPredicate;
 
   @override
   _MonthPickerState createState() => _MonthPickerState();
@@ -621,8 +612,8 @@ class _MonthPickerState extends State<MonthPicker>
     }
   }
 
-  MaterialLocalizations localizations;
-  TextDirection textDirection;
+  late MaterialLocalizations localizations;
+  late TextDirection textDirection;
 
   @override
   void didChangeDependencies() {
@@ -631,12 +622,12 @@ class _MonthPickerState extends State<MonthPicker>
     textDirection = Directionality.of(context);
   }
 
-  DateTime _todayDate;
-  DateTime _currentDisplayedMonthDate;
-  Timer _timer;
-  PageController _dayPickerController;
-  AnimationController _chevronOpacityController;
-  Animation<double> _chevronOpacityAnimation;
+  late DateTime _todayDate;
+  late DateTime _currentDisplayedMonthDate;
+  late Timer _timer;
+  late PageController _dayPickerController;
+  late AnimationController _chevronOpacityController;
+  late Animation<double> _chevronOpacityAnimation;
 
   void _updateCurrentDate() {
     _todayDate = DateTime.now();
@@ -645,7 +636,7 @@ class _MonthPickerState extends State<MonthPicker>
     Duration timeUntilTomorrow = tomorrow.difference(_todayDate);
     timeUntilTomorrow +=
         const Duration(seconds: 1); // so we don't miss it by rounding
-    _timer?.cancel();
+    _timer.cancel();
     _timer = Timer(timeUntilTomorrow, () {
       setState(() {
         _updateCurrentDate();
@@ -714,8 +705,8 @@ class _MonthPickerState extends State<MonthPicker>
         .isBefore(DateTime(widget.lastDate.year, widget.lastDate.month));
   }
 
-  DateTime _previousMonthDate;
-  DateTime _nextMonthDate;
+  late DateTime _previousMonthDate;
+  late DateTime _nextMonthDate;
 
   void _handleMonthPageChanged(int monthPage) {
     setState(() {
@@ -798,8 +789,8 @@ class _MonthPickerState extends State<MonthPicker>
 
   @override
   void dispose() {
-    _timer?.cancel();
-    _dayPickerController?.dispose();
+    _timer.cancel();
+    _dayPickerController.dispose();
     super.dispose();
   }
 }
@@ -834,14 +825,12 @@ class YearPicker extends StatefulWidget {
   /// Rarely used directly. Instead, typically used as part of the dialog shown
   /// by [showDatePicker].
   YearPicker({
-    Key key,
-    @required this.selectedDate,
-    @required this.onChanged,
-    @required this.firstDate,
-    @required this.lastDate,
-  })  : assert(selectedDate != null),
-        assert(onChanged != null),
-        assert(!firstDate.isAfter(lastDate)),
+    Key? key,
+    required this.selectedDate,
+    required this.onChanged,
+    required this.firstDate,
+    required this.lastDate,
+  })  : assert(!firstDate.isAfter(lastDate)),
         super(key: key);
 
   /// The currently selected date.
@@ -864,7 +853,7 @@ class YearPicker extends StatefulWidget {
 
 class _YearPickerState extends State<YearPicker> {
   static const double _itemExtent = 50.0;
-  ScrollController scrollController;
+  late ScrollController scrollController;
 
   @override
   void initState() {
@@ -880,7 +869,7 @@ class _YearPickerState extends State<YearPicker> {
   Widget build(BuildContext context) {
     assert(debugCheckHasMaterial(context));
     final ThemeData themeData = Theme.of(context);
-    final TextStyle style = themeData.textTheme.body1;
+    final TextStyle? style = themeData.textTheme.bodyText2;
 
     return ListView.builder(
       controller: scrollController,
@@ -892,8 +881,8 @@ class _YearPickerState extends State<YearPicker> {
         var dateee =
             DateTime(year, widget.selectedDate.month, widget.selectedDate.day);
         var pYear = PersianDate.pDate(gregorian: dateee.toString());
-        final TextStyle itemStyle = isSelected
-            ? themeData.textTheme.headline
+        final TextStyle? itemStyle = isSelected
+            ? themeData.textTheme.headline5!
                 .copyWith(color: themeData.accentColor)
             : style;
         return InkWell(
@@ -916,7 +905,7 @@ class _YearPickerState extends State<YearPicker> {
 
 class _DatePickerDialog extends StatefulWidget {
   const _DatePickerDialog(
-      {Key key,
+      {Key? key,
       this.initialDate,
       this.firstDate,
       this.lastDate,
@@ -926,35 +915,35 @@ class _DatePickerDialog extends StatefulWidget {
       this.showTimePicker,
       this.convertToGregorian,
       this.initialTime,
-      this.hore24Format})
+      this.hour24Format})
       : super(key: key);
 
-  final DateTime initialDate;
-  final DateTime firstDate;
-  final DateTime lastDate;
-  final SelectableDayPredicate selectableDayPredicate;
-  final DatePickerMode initialDatePickerMode;
-  final String selectedFormat;
-  final bool convertToGregorian;
-  final bool showTimePicker;
-  final bool hore24Format;
-  final TimeOfDay initialTime;
+  final DateTime? initialDate;
+  final DateTime? firstDate;
+  final DateTime? lastDate;
+  final SelectableDayPredicate? selectableDayPredicate;
+  final DatePickerMode? initialDatePickerMode;
+  final String? selectedFormat;
+  final bool? convertToGregorian;
+  final bool? showTimePicker;
+  final bool? hour24Format;
+  final TimeOfDay? initialTime;
 
   @override
   _DatePickerDialogState createState() => _DatePickerDialogState();
 }
 
-Future<TimeOfDay> _getTime(BuildContext context,
-    {TimeOfDay initialTime, bool hore24Format = false}) {
+Future<TimeOfDay?>? _getTime(BuildContext context,
+    {TimeOfDay? initialTime, bool? hour24Format = false}) {
   return showTimePicker(
     context: context,
-    builder: (BuildContext context, Widget child) {
+    builder: (BuildContext context, Widget? child) {
       return Directionality(
         textDirection: TextDirection.rtl,
         child: MediaQuery(
           data: MediaQuery.of(context)
-              .copyWith(alwaysUse24HourFormat: hore24Format),
-          child: child,
+              .copyWith(alwaysUse24HourFormat: hour24Format!),
+          child: child!,
         ),
       );
     },
@@ -966,14 +955,14 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
   @override
   void initState() {
     super.initState();
-    _selectedDate = widget.initialDate;
-    _mode = widget.initialDatePickerMode;
+    _selectedDate = widget.initialDate!;
+    _mode = widget.initialDatePickerMode!;
   }
 
   bool _announcedInitialDate = false;
 
-  MaterialLocalizations localizations;
-  TextDirection textDirection;
+  late MaterialLocalizations localizations;
+  late TextDirection textDirection;
 
   @override
   void didChangeDependencies() {
@@ -989,8 +978,8 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
     }
   }
 
-  DateTime _selectedDate;
-  DatePickerMode _mode;
+  late DateTime _selectedDate;
+  late DatePickerMode _mode;
   final GlobalKey _pickerKey = GlobalKey();
 
   void _vibrate() {
@@ -1049,11 +1038,11 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
 
   void _handleOk() async {
     String selectedFormat =
-        widget.selectedFormat.replaceAll("am", "").replaceAll("AM", "");
+        widget.selectedFormat!.replaceAll("am", "").replaceAll("AM", "");
 
-    if (widget.showTimePicker) {
+    if (widget.showTimePicker!) {
       final time = await _getTime(context,
-          initialTime: widget.initialTime, hore24Format: widget.hore24Format);
+          initialTime: widget.initialTime, hour24Format: widget.hour24Format!);
       time != null
           ? _selectedDate = new DateTime.utc(
               _selectedDate.year,
@@ -1068,16 +1057,16 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
               0,
               0);
 
-      if (widget.hore24Format) {
+      if (widget.hour24Format!) {
         selectedFormat = selectedFormat.replaceAll("h", "H");
         selectedFormat = "$selectedFormat";
       }
     }
 
     var selectpDate = PersianDate.pDate(
-        defualtFormat: widget.selectedFormat,
+        defaultFormat: widget.selectedFormat!,
         gregorian: _selectedDate.toString());
-    if (widget.convertToGregorian) {
+    if (widget.convertToGregorian!) {
       selectedFormat = selectedFormat
           .replaceAll("MM", "MMMMM")
           .replaceAll("M", "MMM")
@@ -1095,15 +1084,14 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
   }
 
   Widget _buildPicker() {
-    assert(_mode != null);
     switch (_mode) {
       case DatePickerMode.day:
         return MonthPicker(
           key: _pickerKey,
           selectedDate: _selectedDate,
           onChanged: _handleDayChanged,
-          firstDate: widget.firstDate,
-          lastDate: widget.lastDate,
+          firstDate: widget.firstDate!,
+          lastDate: widget.lastDate!,
           selectableDayPredicate: widget.selectableDayPredicate,
         );
       case DatePickerMode.year:
@@ -1111,11 +1099,10 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
           key: _pickerKey,
           selectedDate: _selectedDate,
           onChanged: _handleYearChanged,
-          firstDate: widget.firstDate,
-          lastDate: widget.lastDate,
+          firstDate: widget.firstDate!,
+          lastDate: widget.lastDate!,
         );
     }
-    return null;
   }
 
   @override
@@ -1129,11 +1116,11 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
     );
     final Widget actions = ButtonBar(
       children: <Widget>[
-        FlatButton(
+        TextButton(
           child: Text("لغو"),
           onPressed: _handleCancel,
         ),
-        FlatButton(
+        TextButton(
           child: Text("تایید"),
           onPressed: _handleOk,
         ),
@@ -1141,7 +1128,6 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
     );
     final Dialog dialog = Dialog(child: OrientationBuilder(
         builder: (BuildContext context, Orientation orientation) {
-      assert(orientation != null);
       final Widget header = _DatePickerHeader(
         selectedDate: _selectedDate,
         mode: _mode,
@@ -1194,7 +1180,6 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
             ),
           );
       }
-      return null;
     }));
 
     return Theme(
@@ -1239,19 +1224,19 @@ typedef SelectableDayPredicate = bool Function(DateTime day);
 ///
 ///  * [showTimePicker]
 ///  * <https://material.google.com/components/pickers.html#pickers-date-pickers>
-Future<String> jalaliCalendarPicker(
-    {@required BuildContext context,
-    SelectableDayPredicate selectableDayPredicate,
+Future<String?> jalaliCalendarPicker(
+    {required BuildContext context,
+    SelectableDayPredicate? selectableDayPredicate,
     DatePickerMode initialDatePickerMode = DatePickerMode.day,
-    String selectedFormat,
-    bool toArray,
-    Locale locale,
-    TextDirection textDirection = TextDirection.rtl,
+    String? selectedFormat,
+    bool? toArray,
+    Locale? locale,
+    TextDirection? textDirection = TextDirection.rtl,
     bool convertToGregorian = false,
     bool showTimePicker = false,
-    bool hore24Format = false,
-    TimeOfDay initialTime,
-    DateTime initialDate}) async {
+    bool hour24Format = false,
+    TimeOfDay? initialTime,
+    DateTime? initialDate}) async {
   initialDate = initialDate ?? DateTime.now();
   DateTime firstDate = DateTime(1700);
   DateTime lastDate = DateTime(2200);
@@ -1264,9 +1249,6 @@ Future<String> jalaliCalendarPicker(
       !firstDate.isAfter(lastDate), 'lastDate must be on or after firstDate');
   assert(selectableDayPredicate == null || selectableDayPredicate(initialDate),
       'Provided initialDate must satisfy provided selectableDayPredicate');
-  assert(
-      initialDatePickerMode != null, 'initialDatePickerMode must not be null');
-  assert(context != null);
   assert(debugCheckHasMaterialLocalizations(context));
 
   Widget child = _DatePickerDialog(
@@ -1276,7 +1258,7 @@ Future<String> jalaliCalendarPicker(
     selectableDayPredicate: selectableDayPredicate,
     initialDatePickerMode: initialDatePickerMode,
     selectedFormat: selectedFormat ?? "yyyy-mm-dd HH:nn:ss",
-    hore24Format: hore24Format,
+    hour24Format: hour24Format,
     showTimePicker: showTimePicker,
     convertToGregorian: convertToGregorian,
     initialTime: initialTime ?? TimeOfDay.now(),
