@@ -24,13 +24,13 @@ class DatePicker {
     bool showTitleActions: true,
     int minYear: _kDefaultMinYear,
     int maxYear: _kDefaultMaxYear,
-    int initialYear,
-    int initialMonth,
-    int initialDay,
-    Widget cancel,
-    Widget confirm,
-    DateChangedCallback onChanged,
-    DateChangedCallback onConfirm,
+    int? initialYear,
+    int? initialMonth,
+    int? initialDay,
+    Widget? cancel,
+    Widget? confirm,
+    DateChangedCallback? onChanged,
+    DateChangedCallback? onConfirm,
     dateFormat: _kDateFormatDefault,
   }) {
     if (dateFormat == null || dateFormat.length == 0) {
@@ -50,19 +50,19 @@ class DatePicker {
 
     Navigator.push(
       context,
-      new _DatePickerRoute(
+       _DatePickerRoute(
         showTitleActions: showTitleActions,
         minYear: minYear,
         maxYear: maxYear,
         initialYear: initialYear,
         initialMonth: initialMonth,
         initialDate: initialDay,
-        cancel: cancel,
-        confirm: confirm,
-        onChanged: onChanged,
-        onConfirm: onConfirm,
+        cancel: cancel!,
+        confirm: confirm!,
+        onChanged: onChanged!,
+        onConfirm: onConfirm!,
         dateFormat: dateFormat,
-        theme: Theme.of(context, shadowThemeOnly: true),
+        theme: Theme.of(context),
         barrierLabel:
             MaterialLocalizations.of(context).modalBarrierDismissLabel,
       ),
@@ -71,6 +71,15 @@ class DatePicker {
 }
 
 class _DatePickerRoute<T> extends PopupRoute<T> {
+  final bool? showTitleActions;
+  final int? minYear, maxYear, initialYear, initialMonth, initialDate;
+  final Widget? cancel, confirm;
+  final DateChangedCallback? onChanged;
+  final DateChangedCallback? onConfirm;
+  final ThemeData? theme;
+  final String? locale;
+  final String? dateFormat;
+
   _DatePickerRoute({
     this.showTitleActions,
     this.minYear,
@@ -83,20 +92,12 @@ class _DatePickerRoute<T> extends PopupRoute<T> {
     this.onChanged,
     this.onConfirm,
     this.theme,
-    this.barrierLabel,
+    this.barrierLabel='',
     this.locale,
     this.dateFormat,
-    RouteSettings settings,
+    RouteSettings? settings,
   }) : super(settings: settings);
 
-  final bool showTitleActions;
-  final int minYear, maxYear, initialYear, initialMonth, initialDate;
-  final Widget cancel, confirm;
-  final DateChangedCallback onChanged;
-  final DateChangedCallback onConfirm;
-  final ThemeData theme;
-  final String locale;
-  final String dateFormat;
 
   @override
   Duration get transitionDuration => const Duration(milliseconds: 200);
@@ -110,47 +111,57 @@ class _DatePickerRoute<T> extends PopupRoute<T> {
   @override
   Color get barrierColor => Colors.black54;
 
-  AnimationController _animationController;
+  late AnimationController _animationController;
 
   @override
   AnimationController createAnimationController() {
-    assert(_animationController == null);
     _animationController =
-        BottomSheet.createAnimationController(navigator.overlay);
+        BottomSheet.createAnimationController(navigator!.overlay as TickerProvider);
     return _animationController;
   }
 
   @override
   Widget buildPage(BuildContext context, Animation<double> animation,
       Animation<double> secondaryAnimation) {
-    Widget bottomSheet = new MediaQuery.removePadding(
+    Widget bottomSheet =  MediaQuery.removePadding(
       context: context,
       removeTop: true,
       child: _DatePickerComponent(
-        minYear: minYear,
-        maxYear: maxYear,
-        initialYear: initialYear,
-        initialMonth: initialMonth,
-        initialDate: initialDate,
-        cancel: cancel,
-        confirm: confirm,
-        onChanged: onChanged,
-        locale: locale,
-        dateFormat: dateFormat,
+        minYear: minYear!,
+        maxYear: maxYear!,
+        initialYear: initialYear!,
+        initialMonth: initialMonth!,
+        initialDate: initialDate!,
+        cancel: cancel!,
+        confirm: confirm!,
+        onChanged: onChanged!,
+        locale: locale!,
+        dateFormat: dateFormat!,
         route: this,
       ),
     );
     if (theme != null) {
-      bottomSheet = new Theme(data: theme, child: bottomSheet);
+      bottomSheet =  Theme(data: theme!, child: bottomSheet);
     }
     return bottomSheet;
   }
 }
 
 class _DatePickerComponent extends StatefulWidget {
+  final DateChangedCallback? onChanged;
+  final int minYear, maxYear, initialYear, initialMonth, initialDate;
+
+  final Widget? cancel;
+  final Widget? confirm;
+
+  final _DatePickerRoute route;
+
+  final String? locale;
+  final String? dateFormat;
+
   _DatePickerComponent(
-      {Key key,
-      @required this.route,
+      {Key? key,
+      required this.route,
       this.minYear: _kDefaultMinYear,
       this.maxYear: _kDefaultMaxYear,
       this.initialYear: -1,
@@ -162,17 +173,6 @@ class _DatePickerComponent extends StatefulWidget {
       this.locale,
       this.dateFormat});
 
-  final DateChangedCallback onChanged;
-  final int minYear, maxYear, initialYear, initialMonth, initialDate;
-
-  final Widget cancel;
-  final Widget confirm;
-
-  final _DatePickerRoute route;
-
-  final String locale;
-  final String dateFormat;
-
   @override
   State<StatefulWidget> createState() => _DatePickerState(this.minYear,
       this.maxYear, this.initialYear, this.initialMonth, this.initialDate);
@@ -180,56 +180,56 @@ class _DatePickerComponent extends StatefulWidget {
 
 class _DatePickerState extends State<_DatePickerComponent> {
   final int minYear, maxYear;
-  int _currentYear, _currentMonth, _currentDate;
-  int _dateCountOfMonth;
-  FixedExtentScrollController yearScrollCtrl, monthScrollCtrl, dateScrollCtrl;
+  int? _currentYear, _currentMonth, _currentDate;
+  int? _dateCountOfMonth;
+  FixedExtentScrollController? yearScrollCtrl, monthScrollCtrl, dateScrollCtrl;
 
   _DatePickerState(this.minYear, this.maxYear, this._currentYear,
       this._currentMonth, this._currentDate) {
     if (this._currentYear == -1) {
       this._currentYear = this.minYear;
     }
-    if (this._currentYear < this.minYear) {
+    if (this._currentYear! < this.minYear) {
       this._currentYear = this.minYear;
     }
-    if (this._currentYear > this.maxYear) {
+    if (this._currentYear! > this.maxYear) {
       this._currentYear = this.maxYear;
     }
 
-    if (this._currentMonth < 1) {
+    if (this._currentMonth! < 1) {
       this._currentMonth = 1;
     }
-    if (this._currentMonth > 12) {
+    if (this._currentMonth! > 12) {
       this._currentMonth = 12;
     }
 
-    if (this._currentDate < 1) {
+    if (this._currentDate! < 1) {
       this._currentDate = 1;
     }
-    if (this._currentDate > 31) {
+    if (this._currentDate! > 31) {
       this._currentDate = 31;
     }
 
-    yearScrollCtrl = new FixedExtentScrollController(
-        initialItem: _currentYear - this.minYear);
+    yearScrollCtrl =  FixedExtentScrollController(
+        initialItem: _currentYear! - this.minYear);
     monthScrollCtrl =
-        new FixedExtentScrollController(initialItem: _currentMonth - 1);
+         FixedExtentScrollController(initialItem: _currentMonth! - 1);
     dateScrollCtrl =
-        new FixedExtentScrollController(initialItem: _currentDate - 1);
+         FixedExtentScrollController(initialItem: _currentDate! - 1);
     _dateCountOfMonth = _calcDateCount();
   }
 
   @override
   Widget build(BuildContext context) {
-    return new GestureDetector(
-      child: new AnimatedBuilder(
-        animation: widget.route.animation,
-        builder: (BuildContext context, Widget child) {
-          return new ClipRect(
-            child: new CustomSingleChildLayout(
-              delegate: new _BottomPickerLayout(widget.route.animation.value,
+    return  GestureDetector(
+      child:  AnimatedBuilder(
+        animation: widget.route.animation!,
+        builder: (BuildContext context, Widget? child) {
+          return  ClipRect(
+            child:  CustomSingleChildLayout(
+              delegate:  _BottomPickerLayout(widget.route.animation!.value,
                   showTitleActions: widget.route.showTitleActions),
-              child: new GestureDetector(
+              child:  GestureDetector(
                 child: Material(
                   color: Colors.transparent,
                   child: _renderPickerView(),
@@ -260,7 +260,7 @@ class _DatePickerState extends State<_DatePickerComponent> {
           _dateCountOfMonth = dateCount;
         });
       }
-      if (_currentDate > dateCount) {
+      if (_currentDate! > dateCount) {
         _currentDate = dateCount;
       }
       _notifyDateChanged();
@@ -293,24 +293,24 @@ class _DatePickerState extends State<_DatePickerComponent> {
 
   int _calcDateCount() {
     if (_currentMonth == 12) {
-      var modeyear = _currentYear % 33;
+      var modeyear = _currentYear! % 33;
       if (_kabise.indexOf(modeyear) != -1) {
         return 30;
       }
       return 29;
     }
-    return _daysInMonth[_currentMonth - 1];
+    return _daysInMonth[_currentMonth! - 1];
   }
 
   void _notifyDateChanged() {
     if (widget.onChanged != null) {
-      widget.onChanged(_currentYear, _currentMonth, _currentDate);
+      widget.onChanged!(_currentYear!, _currentMonth!, _currentDate!);
     }
   }
 
   Widget _renderPickerView() {
     Widget itemView = _renderItemView();
-    if (widget.route.showTitleActions) {
+    if (widget.route.showTitleActions!) {
       return Column(
         children: <Widget>[
           _renderTitleActionsView(),
@@ -322,7 +322,7 @@ class _DatePickerState extends State<_DatePickerComponent> {
   }
 
   Widget _renderYearsPickerComponent(String yearAppend) {
-    return new Expanded(
+    return  Expanded(
       flex: 1,
       child: Container(
         padding: EdgeInsets.all(8.0),
@@ -353,8 +353,8 @@ class _DatePickerState extends State<_DatePickerComponent> {
     );
   }
 
-  Widget _renderMonthsPickerComponent(String monthAppend, {String format}) {
-    return new Expanded(
+  Widget _renderMonthsPickerComponent(String monthAppend, {String? format}) {
+    return  Expanded(
       flex: 1,
       child: Container(
           padding: EdgeInsets.all(8.0),
@@ -373,7 +373,7 @@ class _DatePickerState extends State<_DatePickerComponent> {
                 alignment: Alignment.center,
                 child: Row(
                   children: <Widget>[
-                    new Expanded(
+                     Expanded(
                         child: Text(
                       (format == null)
                           // index is 0,1,2...11  month is 1,2,3...12
@@ -395,7 +395,7 @@ class _DatePickerState extends State<_DatePickerComponent> {
   }
 
   Widget _renderDaysPickerComponent(String dayAppend) {
-    return new Expanded(
+    return  Expanded(
       flex: 1,
       child: Container(
           padding: EdgeInsets.all(8.0),
@@ -408,7 +408,7 @@ class _DatePickerState extends State<_DatePickerComponent> {
             onSelectedItemChanged: (int index) {
               _setDate(index);
             },
-            children: List.generate(_dateCountOfMonth, (int index) {
+            children: List.generate(_dateCountOfMonth!, (int index) {
               return Container(
                 height: _kDatePickerItemHeight,
                 alignment: Alignment.center,
@@ -429,8 +429,8 @@ class _DatePickerState extends State<_DatePickerComponent> {
     String monthAppend = "";
     String dayAppend = "";
 
-    List<Widget> pickers = new List<Widget>();
-    List<String> formatSplit = widget.dateFormat.split('-');
+    List<Widget> pickers =  <Widget>[];
+    List<String> formatSplit = widget.dateFormat!.split('-');
     for (int i = 0; i < formatSplit.length; i++) {
       var format = formatSplit[i];
       if (format.contains("yy")) {
@@ -461,7 +461,7 @@ class _DatePickerState extends State<_DatePickerComponent> {
     String done = "تایید";
     String cancel = "لغو";
 
-    Widget cancelWidget = this.widget.cancel;
+    Widget? cancelWidget = this.widget.cancel!;
     if (cancelWidget == null) {
       cancelWidget = Text(
         '$cancel',
@@ -472,7 +472,7 @@ class _DatePickerState extends State<_DatePickerComponent> {
       );
     }
 
-    Widget confirmWidget = this.widget.confirm;
+    Widget confirmWidget = this.widget.confirm!;
     if (confirmWidget == null) {
       confirmWidget = Text(
         '$done',
@@ -491,21 +491,21 @@ class _DatePickerState extends State<_DatePickerComponent> {
         children: <Widget>[
           Container(
             height: _kDatePickerTitleHeight,
-            child: FlatButton(
+            child: TextButton(
               child: cancelWidget,
               onPressed: () => Navigator.pop(context),
             ),
           ),
           Container(
             height: _kDatePickerTitleHeight,
-            child: FlatButton(
+            child: TextButton(
               child: confirmWidget,
               onPressed: () {
                 if (widget.route.onConfirm != null) {
-                  widget.route.onConfirm(
-                      int.parse(_digits(_currentYear, 2)),
-                      int.parse(_digits(_currentMonth, 2)),
-                      int.parse(_digits(_currentDate, 2)));
+                  widget.route.onConfirm!(
+                      int.parse(_digits(_currentYear!, 2)),
+                      int.parse(_digits(_currentMonth!, 2)),
+                      int.parse(_digits(_currentDate!, 2)));
                 }
                 Navigator.pop(context);
               },
@@ -538,20 +538,20 @@ class _DatePickerState extends State<_DatePickerComponent> {
 }
 
 class _BottomPickerLayout extends SingleChildLayoutDelegate {
-  _BottomPickerLayout(this.progress, {this.itemCount, this.showTitleActions});
+  _BottomPickerLayout(this.progress, {this.itemCount=0, this.showTitleActions=true});
 
   final double progress;
   final int itemCount;
-  final bool showTitleActions;
+  final bool? showTitleActions;
 
   @override
   BoxConstraints getConstraintsForChild(BoxConstraints constraints) {
     double maxHeight = _kDatePickerHeight;
-    if (showTitleActions) {
+    if (showTitleActions!) {
       maxHeight += _kDatePickerTitleHeight;
     }
 
-    return new BoxConstraints(
+    return  BoxConstraints(
         minWidth: constraints.maxWidth,
         maxWidth: constraints.maxWidth,
         minHeight: 0.0,
@@ -561,7 +561,7 @@ class _BottomPickerLayout extends SingleChildLayoutDelegate {
   @override
   Offset getPositionForChild(Size size, Size childSize) {
     double height = size.height - childSize.height * progress;
-    return new Offset(0.0, height);
+    return  Offset(0.0, height);
   }
 
   @override
