@@ -49,24 +49,24 @@ const String am = 'am'; // نمایش وقت به صورت کوتاه
 const String AM = 'AM'; // نمایش وقت به صورت کامل
 
 class PersianDate {
-  int _year;
-  int _month;
-  int _day;
-  int _weekday;
-  int _hour;
-  int _minute;
-  int _second;
-  int _millisecond;
-  int _microsecond;
+  int? _year;
+  int? _month;
+  int? _day;
+  int? _weekday;
+  int? _hour;
+  int? _minute;
+  int? _second;
+  int? _millisecond;
+  int? _microsecond;
   String _getDate = '';
   String _getNow = '';
 
-  String _defualtVal = "yyyy-mm-dd hh:nn:ss SSS";
+  String _defaultVal = "yyyy-mm-dd hh:nn:ss SSS";
 
-  PersianDate.pDate({String defualtFormat, String gregorian}) {
+  PersianDate.pDate({String? defaultFormat, String? gregorian}) {
     var now;
 
-    if (defualtFormat != null) this._defualtVal = defualtFormat;
+    if (defaultFormat != null) this._defaultVal = defaultFormat;
 
     if (gregorian != null) {
       now = DateTime.parse(gregorian);
@@ -80,24 +80,24 @@ class PersianDate {
       this.setSecond = now.second;
       this.setMicrosecond = now.microsecond;
       this.setMillisecond = now.millisecond;
-      _getDate = _toFormat(_defualtVal);
+      _getDate = _toFormat(_defaultVal);
     } else {
-      _getDate = _now();
+      _getDate = _now()!;
     }
   }
 
-  PersianDate([String format]) {
-    if (format != null) _defualtVal = format;
+  PersianDate([String?format]) {
+    if (format != null) _defaultVal = format;
 
-    _getNow = _now();
-    _getDate = _now();
+    _getNow = _now()!;
+    _getDate = _now()!;
   }
 
   String get getDate => _getDate;
 
   String get getNow => _getNow;
 
-  String _now() {
+  String? _now() {
     var now = new DateTime.now();
     List list = gregorianToJalali(now.year, now.month, now.day);
     setWeekday = now.weekday;
@@ -110,7 +110,7 @@ class PersianDate {
     this.setMicrosecond = now.microsecond;
     this.setMillisecond = now.millisecond;
 
-    return _toFormat(_defualtVal);
+    return _toFormat(_defaultVal);
   }
 
   List<String> monthShort = const <String>[
@@ -176,7 +176,7 @@ class PersianDate {
     "1229",
   ];
 
-  gregorianToJalali(int y, int m, int d, [String separator]) {
+  gregorianToJalali(int y, int m, int d, [String? separator]) {
     var sumMonthDay = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
     var jY = 0;
     if (y > 1600) {
@@ -218,7 +218,7 @@ class PersianDate {
     return persionDate;
   }
 
-  jalaliToGregorian(int y, int m, int d, [String separator]) {
+  jalaliToGregorian(int y, int m, int d, [String? separator]) {
     int gY;
     if (y > 979) {
       gY = 1600;
@@ -274,7 +274,7 @@ class PersianDate {
     return gregorianDate;
   }
 
-  parse(String formattedString, [String separator]) {
+  parse(String formattedString, [String? separator]) {
     var parse = DateTime.parse(formattedString);
     if (separator == null) {
       List parseList = gregorianToJalali(parse.year, parse.month, parse.day);
@@ -291,37 +291,37 @@ class PersianDate {
 
   String get monthname => monthLong[this.month - 1];
 
-  int get year => _year;
+  int get year => _year!;
 
   set setYear(int value) {
     _year = value;
   }
 
-  int get month => _month;
+  int get month => _month!;
 
   set setMonth(int value) {
     _month = value;
   }
 
-  int get day => _day;
+  int get day => _day!;
 
   set setDay(int value) {
     _day = value;
   }
 
-  int get weekday => _weekday;
+  int get weekday => _weekday!;
 
   set setWeekday(int value) {
     _weekday = value;
   }
 
-  int get hour => _hour;
+  int get hour => _hour!;
 
   set setHour(int value) {
     _hour = value;
   }
 
-  int get minute => _minute;
+  int get minute => _minute!;
 
   bool get isHoliday {
     if (weekday == 5)
@@ -338,19 +338,19 @@ class PersianDate {
     _minute = value;
   }
 
-  int get second => _second;
+  int get second => _second!;
 
   set setSecond(int value) {
     _second = value;
   }
 
-  int get microsecond => _microsecond;
+  int get microsecond => _microsecond!;
 
   set setMicrosecond(int value) {
     _microsecond = value;
   }
 
-  int get millisecond => _millisecond;
+  int get millisecond => _millisecond!;
 
   set setMillisecond(int value) {
     _millisecond = value;
@@ -412,10 +412,10 @@ class PersianDate {
     return newFormat;
   }
 
-  parseToFormat(String parseDate, [String format]) {
+  parseToFormat(String parseDate, [String? format]) {
     var parse = DateTime.parse(parseDate);
     var jParse = gregorianToJalali(parse.year, parse.month, parse.day);
-    if (format == null) format = _defualtVal;
+    if (format == null) format = _defaultVal;
 
     String newFormat = format;
 
